@@ -180,6 +180,7 @@
     collected: state.coins,
     visited: state.visited,
     onStart: startGame,
+    isBlocked: () => !$("#pause").hidden,
     onFirstMove: () => unlock("firststep"),
     onCoin(i, total, at) {
       if (!state.coins.includes(i)) state.coins.push(i);
@@ -473,7 +474,7 @@
     if (e.key === "Escape") {
       e.preventDefault();
       pause.hidden ? openPause() : closePause();
-    } else if ((e.key === "p" || e.key === "P") && document.activeElement !== $("#map")) {
+    } else if (e.code === "KeyP" && !e.metaKey && !e.ctrlKey && !e.altKey) {
       pause.hidden ? openPause() : closePause();
     }
   });

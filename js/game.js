@@ -116,6 +116,7 @@ window.Overworld = (() => {
     let path = [];
     let target = null;
     const held = [];
+    const taps = []; // each key press is at least one step, even if released before the next frame
     let running = false;
     let last = 0;
 
@@ -291,6 +292,7 @@ window.Overworld = (() => {
     }
     function arrive() {
       p.x = p.tx; p.y = p.ty; p.moving = false; p.steps++;
+      root.dataset.pos = p.x + "," + p.y;
       if (p.steps === 1) opts.onFirstMove && opts.onFirstMove();
       const ci = COINS.findIndex(([cx, cy]) => cx === p.x && cy === p.y);
       if (ci >= 0 && !collected.has(ci)) {
@@ -300,7 +302,7 @@ window.Overworld = (() => {
       if (target && target[0] === p.x && target[1] === p.y) target = null;
       if (isTrigger(p.x, p.y)) {
         const id = tileAt(p.x, p.y) === "S" ? SIGN.id : buildingAt(p.x, p.y).id;
-        path = []; target = null; held.length = 0;
+        path = []; target = null; held.length = 0; taps.length = 0;
         visited.add(id);
         // step back out so the door doesn't re-trigger on return
         p.y += 1; p.dir = "down";
@@ -313,7 +315,7 @@ window.Overworld = (() => {
         if (p.t >= 1) arrive();
       }
       if (!p.moving) {
-        const d = held[held.length - 1];
+        const d = taps.shift() || held[held.length - 1];
         if (d) { path = []; target = null; startStep(p.x + d[0], p.y + d[1]); }
         else if (path.length) { const [nx, ny] = path.shift(); startStep(nx, ny); }
       }
@@ -394,21 +396,31 @@ window.Overworld = (() => {
       ArrowUp: [0, -1], KeyW: [0, -1], ArrowDown: [0, 1], KeyS: [0, 1],
       ArrowLeft: [-1, 0], KeyA: [-1, 0], ArrowRight: [1, 0], KeyD: [1, 0],
     };
-    root.addEventListener("keydown", (e) => {
+    // keys work whenever the map is mostly on screen, without having to click it first
+    let inView = false;
+    new IntersectionObserver(([entry]) => {
+      inView = entry.intersectionRatio >= 0.4;
+      if (!inView) { held.length = 0; taps.length = 0; }
+    }, { threshold: [0, 0.4, 1] }).observe(canvas);
+    window.addEventListener("keydown", (e) => {
       const d = KEYS[e.code];
-      if (!d) return;
+      if (!d || !inView || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (opts.isBlocked && opts.isBlocked()) return;
+      const el = document.activeElement;
+      if (el && (/INPUT|TEXTAREA|SELECT/.test(el.tagName) || el.isContentEditable)) return;
       e.preventDefault();
       opts.onStart && opts.onStart();
       if (!held.includes(d)) held.push(d);
+      if (!e.repeat && taps.length < 4) taps.push(d);
       wake();
     });
-    root.addEventListener("keyup", (e) => {
+    window.addEventListener("keyup", (e) => {
       const d = KEYS[e.code];
       if (!d) return;
       const i = held.indexOf(d);
       if (i >= 0) held.splice(i, 1);
     });
-    root.addEventListener("blur", () => { held.length = 0; }, true);
+    window.addEventListener("blur", () => { held.length = 0; });
     canvas.addEventListener("pointerdown", (e) => {
       const rect = canvas.getBoundingClientRect();
       const tx = Math.floor(((e.clientX - rect.left) / rect.width) * COLS);

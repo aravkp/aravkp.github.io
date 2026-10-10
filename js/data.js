@@ -285,7 +285,7 @@ window.PORTFOLIO_DATA = {
     { id: "levels", name: "Level Select", desc: "Inspected five projects.", hint: "Flip some cartridges.", icon: "pad" },
     { id: "appraiser", name: "Appraiser", desc: "Inspected ten inventory items.", hint: "Click items in the inventory.", icon: "eye" },
     { id: "source", name: "Source Diver", desc: "Opened a project's source code.", hint: "Read the code.", icon: "code" },
-    { id: "pause", name: "Paused", desc: "Opened the pause menu.", hint: "Every game has one. Try Esc.", icon: "pause" },
+    { id: "pause", name: "Paused", desc: "Opened the pause menu.", hint: "Every game has one. Press P.", icon: "pause" },
     { id: "konami", name: "Old School", desc: "Entered the Konami code.", hint: "↑ ↑ ↓ ↓ ← → ← → …", icon: "arrow" },
     { id: "contact", name: "Party Up", desc: "Reached out to say hi.", hint: "Visit the tavern.", icon: "heart" },
     { id: "end", name: "Credits Roll", desc: "Made it to the very end.", hint: "Keep scrolling.", icon: "flag" },
