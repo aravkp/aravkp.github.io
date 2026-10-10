@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arav Kapoor · Player One</title>
+  <meta name="description" content="Arav Kapoor: CS undergrad at Ashoka University building production software with Python, TypeScript, PostgreSQL and GenAI. A portfolio you can play.">
+  <meta property="og:title" content="Arav Kapoor · Player One">
+  <meta property="og:description" content="A portfolio you can play: quests, levels, loot and achievements.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://aravkp.github.io/">
+  <meta name="theme-color" content="#0d0f1a">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Press+Start+2P&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip" href="#stats">Skip the game, read the resume</a>
+
+  <!-- HUD -->
+  <header class="hud" id="hud">
+    <a class="hud-player" href="#start" aria-label="Back to title screen">
+      <span class="hud-avatar" aria-hidden="true">AK</span>
+      <span class="hud-name">ARAV_KP</span>
+    </a>
+    <div class="hud-xp" aria-label="Experience">
+      <span class="hud-level">LV <b id="hud-level">1</b></span>
+      <div class="xp-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="xp-bar">
+        <div class="xp-fill" id="xp-fill"></div>
+      </div>
+      <span class="hud-xp-text" id="hud-xp">0 / 100 XP</span>
+    </div>
+    <nav class="hud-nav" aria-label="Sections">
+      <a href="#stats">Stats</a>
+      <a href="#quests">Quests</a>
+      <a href="#levels">Levels</a>
+      <a href="#inventory">Items</a>
+      <a href="#trophies">Trophies</a>
+      <a href="#party">Contact</a>
+    </nav>
+    <div class="hud-counters">
+      <span class="hud-chip" title="Coins collected"><span class="chip-icon coin-icon" aria-hidden="true"></span><b id="hud-coins">0</b><span class="sr-only"> coins</span></span>
+      <a class="hud-chip" href="#trophies" title="Achievements"><span class="chip-icon cup-icon" aria-hidden="true"></span><b id="hud-trophies">0</b><span class="sr-only"> achievements</span></a>
+      <button class="hud-btn" id="sound-btn" type="button" aria-pressed="false" title="Sound effects">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path class="spk" d="M2 6h3l4-3v10l-4-3H2z"/><path class="on" d="M11 5c1.3 1.6 1.3 4.4 0 6M13 3c2.4 2.8 2.4 7.2 0 10"/><path class="off" d="M11 6l4 4M15 6l-4 4"/></svg>
+        <span class="sr-only">Sound</span>
+      </button>
+      <button class="hud-btn" id="menu-btn" type="button" title="Pause menu (Esc)">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 3h3v10H4zM9 3h3v10H9z"/></svg>
+        <span class="sr-only">Pause menu</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- TITLE + OVERWORLD -->
+    <section class="title-screen" id="start">
+      <div class="wrap">
+        <p class="eyebrow blink-soft">PLAYER 1 · READY</p>
+        <h1 class="game-title" aria-label="Arav Kapoor">
+          <span>ARAV</span>
+          <span>KAPOOR</span>
+        </h1>
+        <p class="title-sub">CS undergrad at Ashoka University. I build software people actually use: a campus delivery startup, a company-wide HR platform, and LLM tools that earn their keep.</p>
+        <div class="title-actions">
+          <button class="btn btn-primary" id="press-start" type="button"><span class="blink">▶</span> PRESS START</button>
+          <a class="btn btn-ghost" href="#stats">Just read it</a>
+        </div>
+      </div>
+
+      <div class="wrap">
+        <div class="game-frame" id="world">
+          <div class="frame-bar">
+            <span>WORLD 1 · CAMPUS</span>
+            <span class="frame-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          </div>
+          <div class="map" id="map" tabindex="0" role="application" aria-label="Overworld map. Use arrow keys or WASD to walk, or use the building buttons to travel to a section.">
+            <canvas aria-hidden="true"></canvas>
+            <div class="map-labels"></div>
+            <button class="map-overlay" id="map-overlay" type="button">
+              <span class="overlay-title">CLICK TO PLAY</span>
+              <span class="overlay-hint">WASD / arrows to walk · tap anywhere to move · step through a door to enter</span>
+            </button>
+          </div>
+          <div class="frame-foot">
+            <span><kbd>WASD</kbd> move</span>
+            <span><kbd>Click</kbd> walk there</span>
+            <span><kbd>Esc</kbd> pause</span>
+            <span class="coin-note">Coins <b id="map-coins">0/8</b></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHARACTER SHEET -->
+    <section class="section" id="stats" data-section>
+      <div class="wrap">
+        <header class="section-head">
+          <p class="eyebrow">01 · CHARACTER SHEET</p>
+          <h2>Player stats</h2>
+        </header>
+        <div class="sheet">
+          <div class="panel sheet-card">
+            <div class="portrait" aria-hidden="true"><canvas id="portrait" width="16" height="16"></canvas></div>
+            <dl class="sheet-attrs">
+              <div><dt>Class</dt><dd>Full-stack engineer</dd></div>
+              <div><dt>Guild</dt><dd>Ashoka University · B.Sc. CS '28</dd></div>
+              <div><dt>Base</dt><dd>Gurugram, Haryana</dd></div>
+              <div><dt>Current quest</dt><dd>Lead Engineer @ DormDash</dd></div>
+              <div><dt>Main stats</dt><dd>Python · TypeScript · PostgreSQL · GenAI</dd></div>
+            </dl>
+          </div>
+          <div class="sheet-main">
+            <div class="panel bio">
+              <p>I'm a Computer Science undergrad at Ashoka University, graduating in 2028. I like building things for real users with real constraints.</p>
+              <p>I led engineering at <strong>DormDash</strong>, a student-run campus delivery startup, taking it from an MVP to a live pilot. At <strong>TARC Limited</strong> I built the appraisal platform the company used to run its full annual review cycle. Most of my work is Python, TypeScript and PostgreSQL, with Claude or Gemini when a problem calls for an LLM. Outside of that I make small games in Godot.</p>
+            </div>
+            <div class="panel scores">
+              <div class="scores-head">
+                <span>HIGH SCORES</span>
+                <span class="muted">real numbers, no cheats</span>
+              </div>
+              <ol class="score-table">
+                <li><span class="rank">1ST</span><span class="score" data-count="150">150</span><span class="what">active customers in the DormDash pilot, mostly repeat</span></li>
+                <li><span class="rank">2ND</span><span class="score">~<span data-count="120">120</span></span><span class="what">employees reviewed on TARC's appraisal platform</span></li>
+                <li><span class="rank">3RD</span><span class="score">4–5 WK</span><span class="what">DormDash pilot, from a standing start to a running service</span></li>
+                <li><span class="rank">4TH</span><span class="score" data-count="25">25</span><span class="what">checks in the TARC row-level-security test suite</span></li>
+                <li><span class="rank">5TH</span><span class="score" data-count="0.84" data-decimals="2">0.84</span><span class="what">ROC-AUC on the Telco churn model</span></li>
+                <li><span class="rank">6TH</span><span class="score" data-count="7043">7,043</span><span class="what">customer records analysed for churn</span></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUEST LOG -->
+    <section class="section" id="quests" data-section>
+      <div class="wrap">
+        <header class="section-head">
+          <p class="eyebrow">02 · QUEST LOG</p>
+          <h2>Experience</h2>
+        </header>
+
+        <div class="quests">
+          <article class="quest panel" data-quest="dormdash">
+            <div class="quest-top">
+              <span class="tag tag-active">MAIN QUEST · ACTIVE</span>
+              <span class="quest-date">Mar 2025 – Present</span>
+            </div>
+            <h3>Lead Engineer <span class="muted">(part-time)</span></h3>
+            <p class="quest-giver">DormDash · Ashoka University startup · <a href="https://dormdash.co.in" target="_blank" rel="noopener">dormdash.co.in</a></p>
+            <ul class="objectives">
+              <li>Built the MVP as a Progressive Web App for door-to-door campus logistics: gate deliveries, laundry, mailroom, tuck shop and within-dorm.</li>
+              <li>Took the Ashoka pilot from a standing start to a running service in 4–5 weeks, reaching 150 active customers (mostly repeat) with a 5–10 min average delivery time.</li>
+              <li>Designed a 4-tap ordering flow with saved dorm/room details, gate-based Dasher routing and live order tracking with a realtime ETA.</li>
+              <li>Built the FastAPI + SQLAlchemy backend with a layered architecture (models, schemas, CRUD, routes) for the request → accept → complete delivery lifecycle.</li>
+            </ul>
+            <div class="quest-foot"><span class="reward">REWARD +30 XP</span><a class="link" data-repo href="https://github.com/aravkp/dormdash" target="_blank" rel="noopener">GitHub</a></div>
+          </article>
+
+          <article class="quest panel" data-quest="tarc">
+            <div class="quest-top">
+              <span class="tag tag-done">CONTRACT · COMPLETE</span>
+              <span class="quest-date">Jun 2026 – Jul 2026</span>
+            </div>
+            <h3>Software Engineer Intern</h3>
+            <p class="quest-giver">TARC Limited · luxury real estate developer · <em>Performance Management System</em> (Next.js 14, TypeScript, Supabase, Vercel)</p>
+            <ul class="objectives">
+              <li>Shipped a production appraisal platform that ran the company's full annual review cycle for ~120 employees: a 9-stage workflow across 5 roles (Employee → Manager → HOD → HR → CXO) built on a 4-perspective Balanced Scorecard.</li>
+              <li>Secured real employee data with Postgres row-level security on every table, column-level salary restrictions, passwordless magic-link auth against a closed directory, and a 25-check RLS test suite.</li>
+              <li>Automated stage-transition emails through Microsoft Graph and built the HR data pipeline: CSV employee import, a live status tracker, and a department-grouped year-end Excel export as the final appraisal report.</li>
+            </ul>
+            <div class="quest-foot"><span class="reward">REWARD +30 XP</span></div>
+          </article>
+
+          <article class="quest panel" data-quest="kia">
+            <div class="quest-top">
+              <span class="tag tag-side">SIDE QUEST · COMPLETE</span>
+              <span class="quest-date">Jun 2025 – Jul 2025</span>
+            </div>
+            <h3>Sales &amp; Marketing Intern</h3>
+            <p class="quest-giver">Prem Wheels Kia, Agra · auto dealership</p>
+            <ul class="objectives">
+              <li>Analysed lead sources (Google, Facebook, third-party platforms) to optimise marketing spend and conversion.</li>
+              <li>Introduced a hunting-line system to streamline customer call handling across the sales team.</li>
+            </ul>
+            <div class="quest-foot"><span class="reward">REWARD +30 XP</span></div>
+          </article>
+        </div>
+
+        <h3 class="sub-head">Origin story</h3>
+        <div class="origin">
+          <div class="panel origin-card">
+            <div class="quest-top"><span class="tag tag-active">IN PROGRESS</span><span class="quest-date">2024 – 2028</span></div>
+            <h4>Ashoka University, Sonipat</h4>
+            <p class="muted">B.Sc. in Computer Science</p>
+            <div class="progress" aria-label="Degree progress"><div class="progress-fill" id="degree-fill"></div></div>
+            <p class="progress-text" id="degree-text"></p>
+          </div>
+          <div class="panel origin-card">
+            <div class="quest-top"><span class="tag tag-done">CLEARED</span><span class="quest-date">2020 – 2024</span></div>
+            <h4>Step By Step School, Noida</h4>
+            <p class="muted">Class XII, Science (PCM)</p>
+            <div class="progress"><div class="progress-fill" style="width:100%"></div></div>
+            <p class="progress-text">100% complete</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LEVEL SELECT -->
+    <section class="section" id="levels" data-section>
+      <div class="wrap">
+        <header class="section-head">
+          <p class="eyebrow">03 · LEVEL SELECT</p>
+          <h2>Projects</h2>
+          <p class="section-note">Click a cartridge to flip it and see what's inside.</p>
+        </header>
+        <div class="tabs" role="toolbar" aria-label="Filter projects" id="world-tabs"></div>
+        <div class="levels-grid" id="levels-grid"></div>
+      </div>
+    </section>
+
+    <!-- INVENTORY -->
+    <section class="section" id="inventory" data-section>
+      <div class="wrap">
+        <header class="section-head">
+          <p class="eyebrow">04 · INVENTORY</p>
+          <h2>Skills</h2>
+          <p class="section-note">Rarity shows how much real work an item has seen. Select one to see where it was used.</p>
+        </header>
+        <div class="inventory">
+          <div class="bags" id="bags"></div>
+          <aside class="panel item-card" id="item-card" aria-live="polite"></aside>
+        </div>
+        <ul class="rarity-legend" aria-label="Rarity legend">
+          <li class="r-legendary">Legendary</li>
+          <li class="r-epic">Epic</li>
+          <li class="r-rare">Rare</li>
+          <li class="r-common">Common</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- TROPHIES -->
+    <section class="section" id="trophies" data-section>
+      <div class="wrap">
+        <header class="section-head">
+          <p class="eyebrow">05 · TROPHY ROOM</p>
+          <h2>Achievements</h2>
+        </header>
+        <div class="panel trophy-summary">
+          <span id="trophy-count">0 / 14 unlocked</span>
+          <div class="progress"><div class="progress-fill" id="trophy-fill"></div></div>
+          <button class="btn btn-small btn-ghost" id="reset-btn" type="button">Reset save</button>
+        </div>
+        <div class="trophy-grid" id="trophy-grid"></div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section party" id="party" data-section>
+      <div class="wrap">
+        <header class="section-head">
+          <p class="eyebrow">06 · THE TAVERN</p>
+          <h2>Player 2, join the party?</h2>
+          <p class="section-note">I'm always up for talking about internships, interesting problems, or games. Send a message.</p>
+        </header>
+        <div class="party-grid">
+          <a class="panel party-card" data-contact href="mailto:aravkapoor2022@gmail.com">
+            <span class="party-kind">EMAIL</span>
+            <span class="party-val">aravkapoor2022@gmail.com</span>
+          </a>
+          <a class="panel party-card" data-contact href="https://www.linkedin.com/in/arav-kapoor-07a435329" target="_blank" rel="noopener">
+            <span class="party-kind">LINKEDIN</span>
+            <span class="party-val">in/arav-kapoor</span>
+          </a>
+          <a class="panel party-card" data-contact href="https://github.com/aravkp" target="_blank" rel="noopener">
+            <span class="party-kind">GITHUB</span>
+            <span class="party-val">@aravkp</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="credits" id="credits">
+    <p class="eyebrow">THANKS FOR PLAYING</p>
+    <p class="final-score">FINAL SCORE <b id="final-xp">0</b> XP · LV <b id="final-lv">1</b></p>
+    <button class="btn btn-primary" id="continue-btn" type="button">CONTINUE? ▲</button>
+    <p class="muted small">© 2026 Arav Kapoor · hand-built with HTML, CSS and a lot of <code>fillRect()</code></p>
+  </footer>
+
+  <!-- PAUSE MENU -->
+  <div class="pause" id="pause" hidden>
+    <div class="pause-box panel" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+      <h2 id="pause-title">PAUSED</h2>
+      <nav class="pause-menu" aria-label="Pause menu">
+        <button type="button" data-close>Resume</button>
+        <button type="button" data-goto="start">Title screen</button>
+        <button type="button" data-goto="stats">Character sheet</button>
+        <button type="button" data-goto="quests">Quest log</button>
+        <button type="button" data-goto="levels">Level select</button>
+        <button type="button" data-goto="inventory">Inventory</button>
+        <button type="button" data-goto="trophies">Trophies</button>
+        <button type="button" data-goto="party">Contact</button>
+        <button type="button" data-sound>Sound: off</button>
+      </nav>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
