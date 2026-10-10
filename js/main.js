@@ -180,7 +180,6 @@
     collected: state.coins,
     visited: state.visited,
     onStart: startGame,
-    isBlocked: () => !$("#pause").hidden,
     onFirstMove: () => unlock("firststep"),
     onCoin(i, total, at) {
       if (!state.coins.includes(i)) state.coins.push(i);
@@ -205,15 +204,11 @@
     },
   });
 
-  $("#map-overlay").addEventListener("click", () => {
-    startGame();
-    $("#map").focus({ preventScroll: true });
-  });
+  $("#map-overlay").addEventListener("click", startGame);
   $("#press-start").addEventListener("click", () => {
     startGame();
     sfx.select();
     goTo("world");
-    setTimeout(() => $("#map").focus({ preventScroll: true }), reduced ? 0 : 500);
   });
 
   // portrait on the character sheet reuses the player sprite
@@ -456,27 +451,24 @@
   }
   $("#sound-btn").addEventListener("click", toggleSound);
 
-  // ---------- keyboard: pause + konami ----------
-  const KONAMI = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "KeyB", "KeyA"];
-  let konamiAt = 0;
-  window.addEventListener("keydown", (e) => {
-    konamiAt = e.code === KONAMI[konamiAt] ? konamiAt + 1 : e.code === KONAMI[0] ? 1 : 0;
-    if (konamiAt === KONAMI.length) {
-      konamiAt = 0;
-      state.crt = !state.crt;
-      save();
-      document.body.classList.toggle("crt", state.crt);
-      toast(state.crt ? "CRT MODE ON" : "CRT MODE OFF", "Enter the code again to switch back.", "arrow");
-      unlock("konami");
-    }
-    const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
-    if (typing) return;
-    if (e.key === "Escape") {
-      e.preventDefault();
-      pause.hidden ? openPause() : closePause();
-    } else if (e.code === "KeyP" && !e.metaKey && !e.ctrlKey && !e.altKey) {
-      pause.hidden ? openPause() : closePause();
-    }
+  // Esc closes the pause menu, like any dialog
+  pause.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closePause();
+  });
+
+  // ---------- secret: tap the AK badge five times for CRT mode ----------
+  let badgeTaps = 0, badgeTimer;
+  $(".hud-avatar").addEventListener("click", (e) => {
+    e.preventDefault();
+    clearTimeout(badgeTimer);
+    badgeTimer = setTimeout(() => { badgeTaps = 0; }, 1500);
+    if (++badgeTaps < 5) return;
+    badgeTaps = 0;
+    state.crt = !state.crt;
+    save();
+    document.body.classList.toggle("crt", state.crt);
+    toast(state.crt ? "CRT MODE ON" : "CRT MODE OFF", "Do it again to switch back.", "arrow");
+    unlock("konami");
   });
 
   // ---------- credits + continue ----------

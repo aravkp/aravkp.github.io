@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Press+Start+2P&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=5">
+  <link rel="stylesheet" href="css/style.css?v=6">
 </head>
 <body>
   <a class="skip" href="#stats">Skip the game, read the resume</a>
@@ -47,7 +47,7 @@
         <svg viewBox="0 0 16 16" aria-hidden="true"><path class="spk" d="M2 6h3l4-3v10l-4-3H2z"/><path class="on" d="M11 5c1.3 1.6 1.3 4.4 0 6M13 3c2.4 2.8 2.4 7.2 0 10"/><path class="off" d="M11 6l4 4M15 6l-4 4"/></svg>
         <span class="sr-only">Sound</span>
       </button>
-      <button class="hud-btn" id="menu-btn" type="button" title="Pause menu (P)">
+      <button class="hud-btn" id="menu-btn" type="button" title="Pause menu">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 3h3v10H4zM9 3h3v10H9z"/></svg>
         <span class="sr-only">Pause menu</span>
       </button>
@@ -76,18 +76,16 @@
             <span>WORLD 1 · CAMPUS</span>
             <span class="frame-dots" aria-hidden="true"><i></i><i></i><i></i></span>
           </div>
-          <div class="map" id="map" tabindex="0" role="application" aria-label="Overworld map. Use arrow keys or WASD to walk, or use the building buttons to travel to a section.">
+          <div class="map" id="map" aria-label="Overworld map. Click a spot to walk there, or use the building buttons to travel to a section.">
             <canvas aria-hidden="true"></canvas>
             <div class="map-labels"></div>
             <button class="map-overlay" id="map-overlay" type="button">
               <span class="overlay-title">CLICK TO PLAY</span>
-              <span class="overlay-hint">WASD / arrows to walk · click or tap to move · step through a door to enter</span>
+              <span class="overlay-hint">Click or tap anywhere to walk there · step through a door to enter</span>
             </button>
           </div>
           <div class="frame-foot">
-            <span><kbd>WASD</kbd> move</span>
-            <span><kbd>Click</kbd> walk there</span>
-            <span><kbd>P</kbd> pause</span>
+            <span>Click or tap anywhere to walk there · step through a door to enter</span>
             <span class="coin-note">Coins <b id="map-coins">0/8</b></span>
           </div>
         </div>
@@ -314,8 +312,8 @@
 
   <div class="toasts" id="toasts" aria-live="polite"></div>
 
-  <script src="js/data.js?v=5"></script>
-  <script src="js/game.js?v=5"></script>
-  <script src="js/main.js?v=5"></script>
+  <script src="js/data.js?v=6"></script>
+  <script src="js/game.js?v=6"></script>
+  <script src="js/main.js?v=6"></script>
 </body>
 </html>
